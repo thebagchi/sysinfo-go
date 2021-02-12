@@ -2,6 +2,8 @@ package sysinfo_go
 
 import (
 	"net"
+	"syscall"
+	"time"
 )
 
 func GetNetworkInterface() (NetworkInterfaces, error) {
@@ -25,4 +27,29 @@ func GetNetworkInterface() (NetworkInterfaces, error) {
 		})
 	}
 	return interfaces, nil
+}
+
+func _MakeUptime(uptime int64) string {
+	duration := time.Duration(uptime) * time.Second
+	return duration.String()
+}
+
+func GetSystemInformation() (*SystemInformation, error) {
+	var (
+		si                      = &syscall.Sysinfo_t{}
+		err                     = syscall.Sysinfo(si)
+		info *SystemInformation = nil
+	)
+	if nil != err {
+		return nil, err
+	}
+	info = &SystemInformation{
+		Uptime:        _MakeUptime(si.Uptime),
+		TotalRam:      si.Totalram,
+		AvailableRam:  si.Freeram,
+		TotalSwap:     si.Totalswap,
+		AvailableSwap: si.Freeswap,
+		Processes:     uint64(si.Procs),
+	}
+	return info, nil
 }
