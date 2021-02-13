@@ -42,5 +42,25 @@ type CPUInformation struct {
 	Processors []ProcessorInformation `json:"processors"`
 }
 
+type CPUStat struct {
+	CPUId     string  `json:"cpuId"`
+	User      int64   `json:"user"`
+	Nice      int64   `json:"nice"`
+	System    int64   `json:"system"`
+	Idle      int64   `json:"idle"`
+	IOWait    int64   `json:"iowait"`
+	IRQ       int64   `json:"irq"`
+	SoftIRQ   int64   `json:"softirq"`
+	Steal     int64   `json:"steal"`
+	Guest     int64   `json:"guest"`
+	GuestNice int64   `json:"guestNice"`
+	Usage     float64 `json:"usage"`
+}
+
 type Stat struct {
+	CPUStats         []CPUStat `json:"cpuStats"`
+	BootTime         int64     `json:"bootTime"`
+	Processes        int64     `json:"processes"`
+	ProcessesRunning int64     `json:"processesRunning"`
+	ProcessesBlocked int64     `json:"processesBlocked"`
 }

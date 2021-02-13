@@ -151,21 +151,164 @@ func _ParseStat(data []byte) (*Stat, error) {
 		}
 		key := FastBytesToString(bytes.TrimSpace(fields[0]))
 		if strings.HasPrefix(key, StatCPU) {
-			if len(key) == len(StatCPU) {
-
-			} else {
-
+			if len(fields) < 8 || len(fields) > 11 {
+				return nil, errors.New("incorrectly formatted stat content")
 			}
+			var (
+				CPUId     string = ""
+				User      int64  = -1
+				Nice      int64  = -1
+				System    int64  = -1
+				Idle      int64  = -1
+				IOWait    int64  = -1
+				IRQ       int64  = -1
+				SoftIRQ   int64  = -1
+				Steal     int64  = 0
+				Guest     int64  = 0
+				GuestNice int64  = 0
+				Total     int64  = 0
+			)
+			for i, field := range fields {
+				switch i {
+				case 0:
+					CPUId = key
+				case 1:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						User = v
+						Total = Total + User
+					}
+				case 2:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						Nice = v
+						Total = Total + Nice
+					}
+				case 3:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						System = v
+						Total = Total + System
+					}
+				case 4:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						Idle = v
+						Total = Total + Idle
+					}
+				case 5:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						IOWait = v
+						Total = Total + IOWait
+					}
+				case 6:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						IRQ = v
+						Total = Total + IRQ
+					}
+				case 7:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						SoftIRQ = v
+						Total = Total + SoftIRQ
+					}
+				case 8:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						Steal = v
+						Total = Total + Steal
+					}
+				case 9:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						Guest = v
+						Total = Total + Guest
+					}
+				case 10:
+					if v, err := strconv.ParseInt(FastBytesToString(field), 10, 64); nil != err {
+						return nil, err
+					} else {
+						GuestNice = v
+						Total = Total + GuestNice
+					}
+				}
+			}
+			usage := (float64(Total-Idle) / float64(Total)) * 100
+			stat.CPUStats = append(stat.CPUStats, CPUStat{
+				CPUId:     CPUId,
+				User:      User,
+				Nice:      Nice,
+				System:    System,
+				Idle:      Idle,
+				IOWait:    IOWait,
+				IRQ:       IRQ,
+				SoftIRQ:   SoftIRQ,
+				Steal:     Steal,
+				Guest:     Guest,
+				GuestNice: GuestNice,
+				Usage:     usage,
+			})
 		} else {
-			fmt.Println(key)
 			switch key {
-			case StatInterrupts:
-			case StatContextSwitches:
-			case StatBootTime:
-			case StatProcesses:
-			case StatProcessesRunning:
-			case StatProcessesBlocked:
 			case StatSoftIRQ:
+				// Do Nothing
+			case StatInterrupts:
+				// Do Nothing
+			case StatContextSwitches:
+				// Do Nothing
+			case StatBootTime:
+				if len(fields) != 2 {
+					return nil, errors.New("incorrectly formatted stat content")
+				}
+				value := FastBytesToString(fields[1])
+				if v, err := strconv.ParseInt(value, 10, 64); nil != err {
+					return nil, err
+				} else {
+					stat.BootTime = v
+				}
+			case StatProcesses:
+				if len(fields) != 2 {
+					return nil, errors.New("incorrectly formatted stat content")
+				}
+				value := FastBytesToString(fields[1])
+				if v, err := strconv.ParseInt(value, 10, 64); nil != err {
+					return nil, err
+				} else {
+					stat.Processes = v
+				}
+			case StatProcessesRunning:
+				if len(fields) != 2 {
+					return nil, errors.New("incorrectly formatted stat content")
+				}
+				value := FastBytesToString(fields[1])
+				if v, err := strconv.ParseInt(value, 10, 64); nil != err {
+					return nil, err
+				} else {
+					stat.ProcessesRunning = v
+				}
+			case StatProcessesBlocked:
+				if len(fields) != 2 {
+					return nil, errors.New("incorrectly formatted stat content")
+				}
+				value := FastBytesToString(fields[1])
+				if v, err := strconv.ParseInt(value, 10, 64); nil != err {
+					return nil, err
+				} else {
+					stat.ProcessesBlocked = v
+				}
+			default:
+				//fmt.Println(FastBytesToString(line))
 			}
 		}
 	}
