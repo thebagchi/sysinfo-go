@@ -8,6 +8,7 @@ import (
 	"net"
 	"reflect"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -19,6 +20,31 @@ const (
 	StatFile    = "/proc/stat"
 	LoadAvgFile = "/proc/loadavg"
 	CPUInfoFile = "/proc/cpuinfo"
+)
+
+const (
+	CPUInfoProcessor      = "processor"
+	CPUInfoVendorId       = "vendor_id"
+	CPUInfoCPUFamily      = "cpu family"
+	CPUInfoModelId        = "model"
+	CPUInfoModelName      = "model name"
+	CPUInfoCoreId         = "core id"
+	CPUInfoPhysicalId     = "physical id"
+	CPUInfoCPUCores       = "cpu cores"
+	CPUInfoCPUFrequency   = "cpu MHz"
+	CPUInfoCacheSize      = "cache size"
+	CPUInfoCacheAlignment = "cache_alignment"
+)
+
+const (
+	StatCPU              = "cpu"
+	StatInterrupts       = "intr"
+	StatContextSwitches  = "ctxt"
+	StatBootTime         = "btime"
+	StatProcesses        = "processes"
+	StatProcessesRunning = "procs_running"
+	StatProcessesBlocked = "procs_blocked"
+	StatSoftIRQ          = "softirq"
 )
 
 func FastStringToBytes(data string) []byte {
@@ -112,13 +138,46 @@ func GetVmStat() error {
 	return nil
 }
 
-func GetStat() error {
+func _ParseStat(data []byte) (*Stat, error) {
+	var (
+		newline = []byte("\n")
+		stat    = new(Stat)
+	)
+	lines := bytes.Split(data, newline)
+	for _, line := range lines {
+		fields := bytes.Fields(line)
+		if len(fields) == 0 {
+			continue
+		}
+		key := FastBytesToString(bytes.TrimSpace(fields[0]))
+		if strings.HasPrefix(key, StatCPU) {
+			if len(key) == len(StatCPU) {
+
+			} else {
+
+			}
+		} else {
+			fmt.Println(key)
+			switch key {
+			case StatInterrupts:
+			case StatContextSwitches:
+			case StatBootTime:
+			case StatProcesses:
+			case StatProcessesRunning:
+			case StatProcessesBlocked:
+			case StatSoftIRQ:
+			}
+		}
+	}
+	return stat, nil
+}
+
+func GetStat() (*Stat, error) {
 	contents, err := ioutil.ReadFile(StatFile)
 	if nil != err {
-		return err
+		return nil, err
 	}
-	fmt.Println(string(contents))
-	return nil
+	return _ParseStat(contents)
 }
 
 func _ParseLoadAvg(data []byte) (*Load, error) {
@@ -204,39 +263,39 @@ func _ParseCPUInfo(data []byte) (*CPUInformation, error) {
 			value = FastBytesToString(bytes.TrimSpace(items[1]))
 		)
 		switch key {
-		case "processor":
+		case CPUInfoProcessor:
 			if v, err := strconv.ParseInt(value, 10, 64); nil != err {
 				return nil, err
 			} else {
 				Id = v
 			}
-		case "vendor_id":
+		case CPUInfoVendorId:
 			VendorId = value
-		case "cpu family":
+		case CPUInfoCPUFamily:
 			CPUFamily = value
-		case "model":
+		case CPUInfoModelId:
 			ModelId = value
-		case "model name":
+		case CPUInfoModelName:
 			ModelName = value
-		case "core id":
+		case CPUInfoCoreId:
 			if v, err := strconv.ParseInt(value, 10, 64); nil != err {
 				return nil, err
 			} else {
 				CoreId = v
 			}
-		case "physical id":
+		case CPUInfoPhysicalId:
 			if v, err := strconv.ParseInt(value, 10, 64); nil != err {
 				return nil, err
 			} else {
 				PhysicalId = v
 			}
-		case "cpu cores":
+		case CPUInfoCPUCores:
 			CPUCores = value
-		case "cpu MHz":
+		case CPUInfoCPUFrequency:
 			CPUFrequency = value
-		case "cache size":
+		case CPUInfoCacheSize:
 			CacheSize = value
-		case "cache_alignment":
+		case CPUInfoCacheAlignment:
 			CacheAlignment = value
 		default:
 			//fmt.Println(key, value)

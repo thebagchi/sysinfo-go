@@ -41,3 +41,6 @@ type ProcessorInformation struct {
 type CPUInformation struct {
 	Processors []ProcessorInformation `json:"processors"`
 }
+
+type Stat struct {
+}
