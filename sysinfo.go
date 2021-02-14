@@ -3,7 +3,6 @@ package sysinfo_go
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"reflect"
@@ -246,13 +245,19 @@ func GetMemInfo() (*MemInfo, error) {
 	return _ParseMemInfo(contents)
 }
 
-func GetVmStat() error {
+func _ParseVMStat(data []byte) (*VMStat, error) {
+	var (
+		vm = new(VMStat)
+	)
+	return vm, nil
+}
+
+func GetVmStat() (*VMStat, error) {
 	contents, err := ioutil.ReadFile(VMStatFile)
 	if nil != err {
-		return err
+		return nil, err
 	}
-	fmt.Println(string(contents))
-	return nil
+	return _ParseVMStat(contents)
 }
 
 func _ParseStat(data []byte) (*Stat, error) {

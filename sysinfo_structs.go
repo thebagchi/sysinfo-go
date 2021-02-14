@@ -75,3 +75,6 @@ type MemInfo struct {
 	SwapTotal  int64 `json:"swapTotal"`
 	SwapFree   int64 `json:"swapFree"`
 }
+
+type VMStat struct {
+}
