@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	UptimeFile  = "/proc/uptime"
 	MemInfoFile = "/proc/meminfo"
 	VMStatFile  = "/proc/vmstat"
 	StatFile    = "/proc/stat"
@@ -575,4 +576,37 @@ func GetCPUInfo() (*CPUInformation, error) {
 		return nil, err
 	}
 	return _ParseCPUInfo(contents)
+}
+
+func _ParseUptime(data []byte) (*Uptime, error) {
+	var (
+		times  = make([]float64, 0)
+		fields = bytes.Fields(data)
+	)
+	for i, field := range fields {
+		if i == 3 {
+			break
+		}
+		value, err := strconv.ParseFloat(FastBytesToString(field), 64)
+		if nil != err {
+			return nil, err
+		}
+		times = append(times, value)
+	}
+	if len(times) != 2 {
+		return nil, errors.New("incorrectly formatted loadavg content")
+	}
+	uptime := &Uptime{
+		Total: times[0],
+		Idle:  times[1],
+	}
+	return uptime, nil
+}
+
+func GetUptime() (*Uptime, error) {
+	contents, err := ioutil.ReadFile(UptimeFile)
+	if nil != err {
+		return nil, err
+	}
+	return _ParseUptime(contents)
 }

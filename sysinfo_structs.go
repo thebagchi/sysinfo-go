@@ -76,5 +76,10 @@ type MemInfo struct {
 	SwapFree   int64 `json:"swapFree"`
 }
 
+type Uptime struct {
+	Total float64 `json:"total"`
+	Idle  float64 `json:"idle"`
+}
+
 type VMStat struct {
 }
