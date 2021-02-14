@@ -47,6 +47,17 @@ const (
 	StatSoftIRQ          = "softirq"
 )
 
+const (
+	MemInfoMemTotal     = "MemTotal"
+	MemInfoMemFree      = "MemFree"
+	MemInfoMemAvailable = "MemAvailable"
+	MemInfoBuffered     = "Buffers"
+	MemInfoCached       = "Cached"
+	MemInfoSwapCached   = "SwapCached"
+	MemInfoSwapTotal    = "SwapTotal"
+	MemInfoSwapFree     = "SwapFree"
+)
+
 func FastStringToBytes(data string) []byte {
 	hdr := *(*reflect.StringHeader)(unsafe.Pointer(&data))
 	return *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
@@ -120,13 +131,119 @@ func GetSystemInformation() (*SystemInformation, error) {
 	return info, nil
 }
 
-func GetMemInfo() error {
+func _ParseMemInfo(data []byte) (*MemInfo, error) {
+	var (
+		mem     = new(MemInfo)
+		newline = []byte("\n")
+		colon   = []byte(":")
+	)
+	lines := bytes.Split(data, newline)
+	for _, line := range lines {
+		if len(line) == 0 {
+			continue
+		}
+		items := bytes.Split(line, colon)
+		if len(items) != 2 {
+			return nil, errors.New("incorrectly formatted meminfo content")
+		}
+		var (
+			key   = FastBytesToString(bytes.TrimSpace(items[0]))
+			value = FastBytesToString(bytes.TrimSpace(items[1]))
+		)
+		switch key {
+		case MemInfoMemTotal:
+			fields := bytes.Fields(FastStringToBytes(value))
+			if len(fields) != 2 {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			}
+			if v, err := strconv.ParseInt(FastBytesToString(fields[0]), 10, 64); nil != err {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			} else {
+				mem.Total = v
+			}
+		case MemInfoMemFree:
+			fields := bytes.Fields(FastStringToBytes(value))
+			if len(fields) != 2 {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			}
+			if v, err := strconv.ParseInt(FastBytesToString(fields[0]), 10, 64); nil != err {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			} else {
+				mem.Free = v
+			}
+		case MemInfoMemAvailable:
+			fields := bytes.Fields(FastStringToBytes(value))
+			if len(fields) != 2 {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			}
+			if v, err := strconv.ParseInt(FastBytesToString(fields[0]), 10, 64); nil != err {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			} else {
+				mem.Available = v
+			}
+		case MemInfoCached:
+			fields := bytes.Fields(FastStringToBytes(value))
+			if len(fields) != 2 {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			}
+			if v, err := strconv.ParseInt(FastBytesToString(fields[0]), 10, 64); nil != err {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			} else {
+				mem.Cached = v
+			}
+		case MemInfoBuffered:
+			fields := bytes.Fields(FastStringToBytes(value))
+			if len(fields) != 2 {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			}
+			if v, err := strconv.ParseInt(FastBytesToString(fields[0]), 10, 64); nil != err {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			} else {
+				mem.Buffered = v
+			}
+		case MemInfoSwapTotal:
+			fields := bytes.Fields(FastStringToBytes(value))
+			if len(fields) != 2 {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			}
+			if v, err := strconv.ParseInt(FastBytesToString(fields[0]), 10, 64); nil != err {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			} else {
+				mem.SwapTotal = v
+			}
+		case MemInfoSwapFree:
+			fields := bytes.Fields(FastStringToBytes(value))
+			if len(fields) != 2 {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			}
+			if v, err := strconv.ParseInt(FastBytesToString(fields[0]), 10, 64); nil != err {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			} else {
+				mem.SwapFree = v
+			}
+		case MemInfoSwapCached:
+			fields := bytes.Fields(FastStringToBytes(value))
+			if len(fields) != 2 {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			}
+			if v, err := strconv.ParseInt(FastBytesToString(fields[0]), 10, 64); nil != err {
+				return nil, errors.New("incorrectly formatted meminfo content")
+			} else {
+				mem.SwapCached = v
+			}
+		default:
+			//fmt.Println(key, value)
+		}
+	}
+	return mem, nil
+}
+
+func GetMemInfo() (*MemInfo, error) {
 	contents, err := ioutil.ReadFile(MemInfoFile)
 	if nil != err {
-		return err
+		return nil, err
 	}
-	fmt.Println(string(contents))
-	return nil
+	return _ParseMemInfo(contents)
 }
 
 func GetVmStat() error {

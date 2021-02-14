@@ -64,3 +64,14 @@ type Stat struct {
 	ProcessesRunning int64     `json:"processesRunning"`
 	ProcessesBlocked int64     `json:"processesBlocked"`
 }
+
+type MemInfo struct {
+	Total      int64 `json:"total"`
+	Free       int64 `json:"free"`
+	Available  int64 `json:"available"`
+	Buffered   int64 `json:"buffered"`
+	Cached     int64 `json:"cached"`
+	SwapCached int64 `json:"swapCached"`
+	SwapTotal  int64 `json:"swapTotal"`
+	SwapFree   int64 `json:"swapFree"`
+}
