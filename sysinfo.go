@@ -3,6 +3,7 @@ package sysinfo_go
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"reflect"
@@ -14,12 +15,13 @@ import (
 )
 
 const (
-	UptimeFile  = "/proc/uptime"
-	MemInfoFile = "/proc/meminfo"
-	VMStatFile  = "/proc/vmstat"
-	StatFile    = "/proc/stat"
-	LoadAvgFile = "/proc/loadavg"
-	CPUInfoFile = "/proc/cpuinfo"
+	UptimeFile      = "/proc/uptime"
+	MemInfoFile     = "/proc/meminfo"
+	VMStatFile      = "/proc/vmstat"
+	StatFile        = "/proc/stat"
+	LoadAvgFile     = "/proc/loadavg"
+	CPUInfoFile     = "/proc/cpuinfo"
+	NetworkStatFile = "/proc/net/dev"
 )
 
 const (
@@ -609,4 +611,79 @@ func GetUptime() (*Uptime, error) {
 		return nil, err
 	}
 	return _ParseUptime(contents)
+}
+
+func _ParseNetworkStats(data []byte) (NetworkStats, error) {
+	var (
+		newline = []byte("\n")
+		colon   = []byte(":")
+		netstat = make(NetworkStats, 0)
+	)
+	var (
+		Interface          string = ""
+		ReceivedBytes      int64  = -1
+		ReceivedPackets    int64  = -1
+		TransmittedBytes   int64  = -1
+		TransmittedPackets int64  = -1
+	)
+	lines := bytes.Split(data, newline)
+	for i, line := range lines {
+		if i < 2 || len(line) == 0 {
+			continue
+		}
+		items := bytes.Split(line, colon)
+		if len(items) != 2 {
+			return nil, errors.New("incorrectly formatted net content")
+		}
+		var (
+			key   = FastBytesToString(bytes.TrimSpace(items[0]))
+			value = bytes.Fields(bytes.TrimSpace(items[1]))
+		)
+		Interface = key
+		fmt.Println(FastBytesToString(items[1]))
+		for i, elem := range value {
+			switch i {
+			case 0:
+				if v, err := strconv.ParseInt(FastBytesToString(elem), 10, 64); nil != err {
+					return nil, err
+				} else {
+					ReceivedBytes = v
+				}
+			case 1:
+				if v, err := strconv.ParseInt(FastBytesToString(elem), 10, 64); nil != err {
+					return nil, err
+				} else {
+					ReceivedPackets = v
+				}
+			case 8:
+				if v, err := strconv.ParseInt(FastBytesToString(elem), 10, 64); nil != err {
+					return nil, err
+				} else {
+					TransmittedBytes = v
+				}
+			case 9:
+				if v, err := strconv.ParseInt(FastBytesToString(elem), 10, 64); nil != err {
+					return nil, err
+				} else {
+					TransmittedPackets = v
+				}
+			}
+		}
+		netstat = append(netstat, NetworkStat{
+			Interface:          Interface,
+			ReceivedBytes:      ReceivedBytes,
+			ReceivedPackets:    ReceivedPackets,
+			TransmittedBytes:   TransmittedBytes,
+			TransmittedPackets: TransmittedPackets,
+		})
+	}
+	return netstat, nil
+}
+
+func GetNetworkStats() (NetworkStats, error) {
+	contents, err := ioutil.ReadFile(NetworkStatFile)
+	if nil != err {
+		return nil, err
+	}
+	return _ParseNetworkStats(contents)
 }

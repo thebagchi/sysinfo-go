@@ -83,3 +83,13 @@ type Uptime struct {
 
 type VMStat struct {
 }
+
+type NetworkStat struct {
+	Interface          string `json:"interface"`
+	ReceivedBytes      int64  `json:"receivedBytes"`
+	ReceivedPackets    int64  `json:"receivedPackets"`
+	TransmittedBytes   int64  `json:"transmittedBytes"`
+	TransmittedPackets int64  `json:"transmittedPackets"`
+}
+
+type NetworkStats []NetworkStat

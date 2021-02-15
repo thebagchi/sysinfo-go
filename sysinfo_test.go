@@ -3,7 +3,6 @@ package sysinfo_go
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"testing"
 )
 
@@ -95,11 +94,14 @@ func TestGetNetworkInterfaces(t *testing.T) {
 	}
 	fmt.Println(string(data))
 
-	{
-		content, err := ioutil.ReadFile(UptimeFile)
-		if nil != err {
-			t.Error(err)
-		}
-		fmt.Println(FastBytesToString(content))
+	network, err := GetNetworkStats()
+	if nil != err {
+		t.Error(err)
 	}
+
+	data, err = json.MarshalIndent(network, "", "    ")
+	if nil != err {
+		t.Error(err)
+	}
+	fmt.Println(string(data))
 }
