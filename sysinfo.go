@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -15,6 +16,7 @@ import (
 )
 
 const (
+	ProcDirectory   = "/proc"
 	UptimeFile      = "/proc/uptime"
 	MemInfoFile     = "/proc/meminfo"
 	VMStatFile      = "/proc/vmstat"
@@ -22,6 +24,8 @@ const (
 	LoadAvgFile     = "/proc/loadavg"
 	CPUInfoFile     = "/proc/cpuinfo"
 	NetworkStatFile = "/proc/net/dev"
+	InterruptFile   = "/proc/interrupts"
+	DiskStatFile    = "/proc/diskstats"
 )
 
 const (
@@ -686,4 +690,22 @@ func GetNetworkStats() (NetworkStats, error) {
 		return nil, err
 	}
 	return _ParseNetworkStats(contents)
+}
+
+func ListProcessId() ([]int, error) {
+	directory, err := os.Open(ProcDirectory)
+	if nil != err {
+		return nil, err
+	}
+	children, err := directory.Readdirnames(0)
+	if nil != err {
+		return nil, err
+	}
+	processes := make([]int, 0)
+	for _, child := range children {
+		if pid, err := strconv.Atoi(child); err == nil {
+			processes = append(processes, pid)
+		}
+	}
+	return processes, nil
 }

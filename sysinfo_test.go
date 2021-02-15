@@ -3,6 +3,7 @@ package sysinfo_go
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"testing"
 )
 
@@ -104,4 +105,27 @@ func TestGetNetworkInterfaces(t *testing.T) {
 		t.Error(err)
 	}
 	fmt.Println(string(data))
+
+	processes, err := ListProcessId()
+	if nil != err {
+		t.Error(err)
+	}
+
+	fmt.Println("Number of processes:", len(processes))
+
+	{
+		content, err := ioutil.ReadFile(InterruptFile)
+		if nil != err {
+			t.Error(err)
+		}
+		fmt.Println(FastBytesToString(content))
+	}
+
+	{
+		content, err := ioutil.ReadFile(DiskStatFile)
+		if nil != err {
+			t.Error(err)
+		}
+		fmt.Println(FastBytesToString(content))
+	}
 }
