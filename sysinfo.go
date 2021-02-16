@@ -709,3 +709,56 @@ func ListProcessId() ([]int, error) {
 	}
 	return processes, nil
 }
+
+func GetUName() (*UName, error) {
+	var (
+		uname  = new(syscall.Utsname)
+		kernel = new(UName)
+	)
+	if err := syscall.Uname(uname); err != nil {
+		return nil, err
+	}
+	builder := new(strings.Builder)
+	for _, it := range uname.Machine {
+		if it != 0 {
+			builder.WriteByte(byte(it))
+		}
+	}
+	kernel.Machine = builder.String()
+	builder.Reset()
+	for _, it := range uname.Domainname {
+		if it != 0 {
+			builder.WriteByte(byte(it))
+		}
+	}
+	kernel.DomainName = builder.String()
+	builder.Reset()
+	for _, it := range uname.Nodename {
+		if it != 0 {
+			builder.WriteByte(byte(it))
+		}
+	}
+	kernel.NodeName = builder.String()
+	builder.Reset()
+	for _, it := range uname.Release {
+		if it != 0 {
+			builder.WriteByte(byte(it))
+		}
+	}
+	kernel.Release = builder.String()
+	builder.Reset()
+	for _, it := range uname.Sysname {
+		if it != 0 {
+			builder.WriteByte(byte(it))
+		}
+	}
+	kernel.SysName = builder.String()
+	builder.Reset()
+	for _, it := range uname.Version {
+		if it != 0 {
+			builder.WriteByte(byte(it))
+		}
+	}
+	kernel.Version = builder.String()
+	return kernel, nil
+}

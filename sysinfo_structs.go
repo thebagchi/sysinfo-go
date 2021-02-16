@@ -93,3 +93,12 @@ type NetworkStat struct {
 }
 
 type NetworkStats []NetworkStat
+
+type UName struct {
+	SysName    string `json:"sysName"`
+	NodeName   string `json:"nodeName"`
+	Release    string `json:"release"`
+	Version    string `json:"version"`
+	Machine    string `json:"machine"`
+	DomainName string `json:"domainName"`
+}
