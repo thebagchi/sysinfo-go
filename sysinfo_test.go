@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"strings"
-	"syscall"
 	"testing"
 )
 
@@ -129,55 +127,5 @@ func TestGetNetworkInterfaces(t *testing.T) {
 			t.Error(err)
 		}
 		fmt.Println(FastBytesToString(content))
-	}
-
-	{
-		uname := new(syscall.Utsname)
-		if err := syscall.Uname(uname); err != nil {
-			t.Error(err)
-		}
-		fmt.Println(uname)
-		builder := new(strings.Builder)
-		for _, it := range uname.Machine {
-			if it != 0 {
-				builder.WriteByte(byte(it))
-			}
-		}
-		fmt.Println(builder.String())
-		builder.Reset()
-		for _, it := range uname.Domainname {
-			if it != 0 {
-				builder.WriteByte(byte(it))
-			}
-		}
-		fmt.Println(builder.String())
-		builder.Reset()
-		for _, it := range uname.Nodename {
-			if it != 0 {
-				builder.WriteByte(byte(it))
-			}
-		}
-		fmt.Println(builder.String())
-		builder.Reset()
-		for _, it := range uname.Release {
-			if it != 0 {
-				builder.WriteByte(byte(it))
-			}
-		}
-		fmt.Println(builder.String())
-		builder.Reset()
-		for _, it := range uname.Sysname {
-			if it != 0 {
-				builder.WriteByte(byte(it))
-			}
-		}
-		fmt.Println(builder.String())
-		builder.Reset()
-		for _, it := range uname.Version {
-			if it != 0 {
-				builder.WriteByte(byte(it))
-			}
-		}
-		fmt.Println(builder.String())
 	}
 }
