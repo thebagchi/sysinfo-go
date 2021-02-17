@@ -102,3 +102,33 @@ type UName struct {
 	Machine    string `json:"machine"`
 	DomainName string `json:"domainName"`
 }
+
+type DiskStat struct {
+	Major            int64  `json:"major"`
+	Minor            int64  `json:"minor"`
+	Device           string `json:"device"`
+	ReadsComplete    int64  `json:"readsComplete"`
+	ReadsMerged      int64  `json:"readsMerged"`
+	SectorsRead      int64  `json:"sectorsRead"`
+	ReadingTime      int64  `json:"readingTime"`
+	WritesComplete   int64  `json:"writesComplete"`
+	WritesMerged     int64  `json:"writesMerged"`
+	SectorsWritten   int64  `json:"sectorsWritten"`
+	WritingTime      int64  `json:"writingTime"`
+	IOInProgess      int64  `json:"ioInProgess"`
+	TotalIOTime      int64  `json:"totalIOTime"`
+	WeightedIOTime   int64  `json:"weightedIOTime"`
+	DiscardsComplete int64  `json:"discardsComplete"`
+	DiscardsMerged   int64  `json:"discardsMerged"`
+	SectorsDiscarded int64  `json:"sectorsDiscarded"`
+	DiscardingTime   int64  `json:"discardingTime"`
+}
+
+type DiskStats []DiskStat
+
+type FileSystemStat struct {
+	Available int64 `json:"available"`
+	Free      int64 `json:"free"`
+	Capacity  int64 `json:"capacity"`
+	Files     int64 `json:"files"`
+}

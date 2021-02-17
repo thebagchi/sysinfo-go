@@ -762,3 +762,188 @@ func GetUName() (*UName, error) {
 	kernel.Version = builder.String()
 	return kernel, nil
 }
+
+func _ParseDiskStats(data []byte) (DiskStats, error) {
+	var (
+		disks   = make(DiskStats, 0)
+		newline = []byte("\n")
+	)
+	lines := bytes.Split(data, newline)
+	var (
+		Major            int64
+		Minor            int64
+		Device           string
+		ReadsComplete    int64
+		ReadsMerged      int64
+		SectorsRead      int64
+		ReadingTime      int64
+		WritesComplete   int64
+		WritesMerged     int64
+		SectorsWritten   int64
+		WritingTime      int64
+		IOInProgess      int64
+		TotalIOTime      int64
+		WeightedIOTime   int64
+		DiscardsComplete int64
+		DiscardsMerged   int64
+		SectorsDiscarded int64
+		DiscardingTime   int64
+	)
+	for _, line := range lines {
+		fields := bytes.Fields(line)
+		for i, field := range fields {
+			switch i {
+			case 0:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					Major = v
+				}
+			case 1:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					Minor = v
+				}
+			case 2:
+				Device = string(bytes.TrimSpace(field))
+			case 3:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					ReadsComplete = v
+				}
+			case 4:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					ReadsMerged = v
+				}
+			case 5:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					SectorsRead = v
+				}
+			case 6:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					ReadingTime = v
+				}
+			case 7:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					WritesComplete = v
+				}
+			case 8:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					WritesMerged = v
+				}
+			case 9:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					SectorsWritten = v
+				}
+			case 10:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					WritingTime = v
+				}
+			case 11:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					IOInProgess = v
+				}
+			case 12:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					TotalIOTime = v
+				}
+			case 13:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					WeightedIOTime = v
+				}
+			case 14:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					DiscardsComplete = v
+				}
+			case 15:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					DiscardsMerged = v
+				}
+			case 16:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					SectorsDiscarded = v
+				}
+			case 17:
+				if v, err := strconv.ParseInt(FastBytesToString(bytes.TrimSpace(field)), 10, 64); nil != err {
+					return nil, err
+				} else {
+					DiscardingTime = v
+				}
+			}
+		}
+		disks = append(disks, DiskStat{
+			Major:            Major,
+			Minor:            Minor,
+			Device:           Device,
+			ReadsComplete:    ReadsComplete,
+			ReadsMerged:      ReadsMerged,
+			SectorsRead:      SectorsRead,
+			ReadingTime:      ReadingTime,
+			WritesComplete:   WritesComplete,
+			WritesMerged:     WritesMerged,
+			SectorsWritten:   SectorsWritten,
+			WritingTime:      WritingTime,
+			IOInProgess:      IOInProgess,
+			TotalIOTime:      TotalIOTime,
+			WeightedIOTime:   WeightedIOTime,
+			DiscardsComplete: DiscardsComplete,
+			DiscardsMerged:   DiscardsMerged,
+			SectorsDiscarded: SectorsDiscarded,
+			DiscardingTime:   DiscardingTime,
+		})
+	}
+	return disks, nil
+}
+
+func GetDiskStats() (DiskStats, error) {
+	contents, err := ioutil.ReadFile(DiskStatFile)
+	if nil != err {
+		return nil, err
+	}
+	return _ParseDiskStats(contents)
+}
+
+func GetFileSystemStat(path string) (*FileSystemStat, error) {
+	var (
+		stat = &syscall.Statfs_t{}
+		err  = syscall.Statfs("/", stat)
+	)
+	if err != nil {
+		return nil, err
+	}
+	fs := &FileSystemStat{
+		Available: stat.Bsize * int64(stat.Bavail),
+		Free:      stat.Bsize * int64(stat.Bfree),
+		Capacity:  stat.Bsize * int64(stat.Blocks),
+		Files:     int64(stat.Files),
+	}
+	return fs, nil
+}
