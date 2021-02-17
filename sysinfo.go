@@ -934,7 +934,7 @@ func GetDiskStats() (DiskStats, error) {
 func GetFileSystemStat(path string) (*FileSystemStat, error) {
 	var (
 		stat = &syscall.Statfs_t{}
-		err  = syscall.Statfs("/", stat)
+		err  = syscall.Statfs(path, stat)
 	)
 	if err != nil {
 		return nil, err
