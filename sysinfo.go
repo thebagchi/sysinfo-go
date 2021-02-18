@@ -3,7 +3,6 @@ package sysinfo_go
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
 	"net"
 	"os"
 	"reflect"
@@ -244,7 +243,7 @@ func _ParseMemInfo(data []byte) (*MemInfo, error) {
 }
 
 func GetMemInfo() (*MemInfo, error) {
-	contents, err := ioutil.ReadFile(MemInfoFile)
+	contents, err := os.ReadFile(MemInfoFile)
 	if nil != err {
 		return nil, err
 	}
@@ -259,7 +258,7 @@ func _ParseVMStat(data []byte) (*VMStat, error) {
 }
 
 func GetVmStat() (*VMStat, error) {
-	contents, err := ioutil.ReadFile(VMStatFile)
+	contents, err := os.ReadFile(VMStatFile)
 	if nil != err {
 		return nil, err
 	}
@@ -446,7 +445,7 @@ func _ParseStat(data []byte) (*Stat, error) {
 }
 
 func GetStat() (*Stat, error) {
-	contents, err := ioutil.ReadFile(StatFile)
+	contents, err := os.ReadFile(StatFile)
 	if nil != err {
 		return nil, err
 	}
@@ -480,7 +479,7 @@ func _ParseLoadAvg(data []byte) (*Load, error) {
 }
 
 func GetLoadAvg() (*Load, error) {
-	contents, err := ioutil.ReadFile(LoadAvgFile)
+	contents, err := os.ReadFile(LoadAvgFile)
 	if nil != err {
 		return nil, err
 	}
@@ -578,7 +577,7 @@ func _ParseCPUInfo(data []byte) (*CPUInformation, error) {
 }
 
 func GetCPUInfo() (*CPUInformation, error) {
-	contents, err := ioutil.ReadFile(CPUInfoFile)
+	contents, err := os.ReadFile(CPUInfoFile)
 	if nil != err {
 		return nil, err
 	}
@@ -611,7 +610,7 @@ func _ParseUptime(data []byte) (*Uptime, error) {
 }
 
 func GetUptime() (*Uptime, error) {
-	contents, err := ioutil.ReadFile(UptimeFile)
+	contents, err := os.ReadFile(UptimeFile)
 	if nil != err {
 		return nil, err
 	}
@@ -687,7 +686,7 @@ func _ParseNetworkStats(data []byte) (NetworkStats, error) {
 }
 
 func GetNetworkStats() (NetworkStats, error) {
-	contents, err := ioutil.ReadFile(NetworkStatFile)
+	contents, err := os.ReadFile(NetworkStatFile)
 	if nil != err {
 		return nil, err
 	}
@@ -928,7 +927,7 @@ func _ParseDiskStats(data []byte) (DiskStats, error) {
 }
 
 func GetDiskStats() (DiskStats, error) {
-	contents, err := ioutil.ReadFile(DiskStatFile)
+	contents, err := os.ReadFile(DiskStatFile)
 	if nil != err {
 		return nil, err
 	}
