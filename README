@@ -1,1 +1,10 @@
-# sysinfo-go
+# System Information
+* CPU Information
+* Memory Information
+* Uptime
+* Filesystem Information
+* Disk Stats
+* Number of processes
+* Network Interfaces
+* Network Stats
+* Load
