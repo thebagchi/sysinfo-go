@@ -3,7 +3,6 @@ package sysinfo_go
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"os"
@@ -238,7 +237,7 @@ func _ParseMemInfo(data []byte) (*MemInfo, error) {
 				mem.SwapCached = v
 			}
 		default:
-			//fmt.Println(key, value)
+			// Do Nothing
 		}
 	}
 	return mem, nil
@@ -371,6 +370,8 @@ func _ParseStat(data []byte) (*Stat, error) {
 						GuestNice = v
 						Total = Total + GuestNice
 					}
+				default:
+					// Do Nothing
 				}
 			}
 			usage := (float64(Total-Idle) / float64(Total)) * 100
@@ -437,7 +438,7 @@ func _ParseStat(data []byte) (*Stat, error) {
 					stat.ProcessesBlocked = v
 				}
 			default:
-				//fmt.Println(FastBytesToString(line))
+				// Do Nothing
 			}
 		}
 	}
@@ -570,7 +571,7 @@ func _ParseCPUInfo(data []byte) (*CPUInformation, error) {
 		case CPUInfoCacheAlignment:
 			CacheAlignment = value
 		default:
-			//fmt.Println(key, value)
+			// Do Nothing
 		}
 	}
 	return info, nil
@@ -644,7 +645,6 @@ func _ParseNetworkStats(data []byte) (NetworkStats, error) {
 			value = bytes.Fields(bytes.TrimSpace(items[1]))
 		)
 		Interface = key
-		fmt.Println(FastBytesToString(items[1]))
 		for i, elem := range value {
 			switch i {
 			case 0:
@@ -671,6 +671,8 @@ func _ParseNetworkStats(data []byte) (NetworkStats, error) {
 				} else {
 					TransmittedPackets = v
 				}
+			default:
+				// Do Nothing
 			}
 		}
 		netstat = append(netstat, NetworkStat{
@@ -897,6 +899,8 @@ func _ParseDiskStats(data []byte) (DiskStats, error) {
 				} else {
 					DiscardingTime = v
 				}
+			default:
+				// Do Nothing
 			}
 		}
 		disks = append(disks, DiskStat{

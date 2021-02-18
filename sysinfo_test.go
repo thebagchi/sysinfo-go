@@ -72,17 +72,6 @@ func TestGetNetworkInterfaces(t *testing.T) {
 	}
 	fmt.Println(string(data))
 
-	vm, err := GetVmStat()
-	if nil != err {
-		t.Error(err)
-	}
-
-	data, err = json.MarshalIndent(vm, "", "    ")
-	if nil != err {
-		t.Error(err)
-	}
-	fmt.Println(string(data))
-
 	uptime, err := GetUptime()
 	if nil != err {
 		t.Error(err)
@@ -129,6 +118,17 @@ func TestGetNetworkInterfaces(t *testing.T) {
 	}
 
 	data, err = json.MarshalIndent(fstat, "", "    ")
+	if nil != err {
+		t.Error(err)
+	}
+	fmt.Println(string(data))
+
+	vm, err := GetVmStat()
+	if nil != err {
+		t.Error(err)
+	}
+
+	data, err = json.MarshalIndent(vm, "", "    ")
 	if nil != err {
 		t.Error(err)
 	}
